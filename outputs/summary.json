@@ -1,0 +1,16 @@
+{
+  "raw_rows": 541909,
+  "exact_duplicates_removed": 5268,
+  "purchase_rows": 524878,
+  "excluded_nonpurchase_rows": 11763,
+  "missing_customer_purchase_rows": 132186,
+  "negative_quantity_value": 893979.73,
+  "source_sha256": "f5385cbb54bbebf7196389109c6b0621faab0c304e3702548165e71c84aede8b",
+  "data_start": "2010-12-01 08:26:00",
+  "data_end": "2011-12-09 12:50:00",
+  "orders": 19960.0,
+  "gross_sales": 10642110.804000024,
+  "aov": 533.1718839679371,
+  "eligible_customers": 3370.0,
+  "repeat_90_rate": 0.4750741839762611
+}
