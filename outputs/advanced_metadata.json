@@ -1,0 +1,16 @@
+{
+  "training_cutoff": "2011-04-01",
+  "training_label_end_exclusive": "2011-05-31",
+  "test_cutoffs": [
+    "2011-07-01",
+    "2011-10-01"
+  ],
+  "horizon_days": 60,
+  "basket_top_skus": 100,
+  "basket_size_range": [
+    2,
+    50
+  ],
+  "basket_min_joint": 30,
+  "eligible_baskets": 16180
+}
