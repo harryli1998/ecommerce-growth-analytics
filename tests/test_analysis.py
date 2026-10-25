@@ -35,3 +35,32 @@ def test_dashboard():
     app.checkbox[0].check().run()
     app.selectbox[0].select('aov').run()
     assert not app.exception
+    app.slider[0].set_value(.5).run()
+    app.number_input[0].set_value(0).run()
+    assert not app.exception
+
+def test_snapshot_does_not_leak_future():
+    import sys
+    sys.path.insert(0,str(ROOT/'src'))
+    from advanced import snapshot
+    orders=pd.DataFrame({'customer_id':['a','a','a','b'],'order_id':['1','2','3','4'],
+                         'ordered_at':pd.to_datetime(['2011-03-01','2011-04-01','2011-05-31','2011-04-10']),
+                         'revenue':[10.,999.,100.,20.]})
+    frame=snapshot(orders,'2011-04-01').set_index('customer_id')
+    assert list(frame.index)==['a']
+    assert frame.loc['a','sales_90']==10
+    assert frame.loc['a','orders_90']==1
+    assert frame.loc['a','returned']==1
+    # Exact exclusive horizon endpoint must not count.
+    assert snapshot(orders[orders.order_id!='2'],'2011-04-01').returned.iloc[0]==0
+
+def test_signed_bridge_reconciles():
+    con=duckdb.connect()
+    ledger=pd.DataFrame({'InvoiceNo':['1','C2','C3','4'],'Quantity':[2,-1,1,2],
+                        'UnitPrice':[10.,10.,5.,-3.],
+                        'InvoiceDate':pd.to_datetime(['2011-01-01']*4)})
+    con.register('ledger',ledger)
+    con.execute((ROOT/'sql/advanced.sql').read_text())
+    row=con.sql('SELECT * FROM revenue_bridge').df().iloc[0]
+    assert row.signed_ledger_value==9
+    assert row.gross_purchase_sales-row.negative_quantity_value+row.exception_value==row.signed_ledger_value
