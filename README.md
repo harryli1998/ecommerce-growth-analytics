@@ -4,6 +4,16 @@ An independent portfolio project started October 24, 2026. Built with AI assista
 
 ![Dashboard preview](docs/dashboard.png)
 
+## Version 2: decision analytics
+
+- **Signed-sales bridge:** reconcile purchase sales, negative-quantity lines and exceptions at month level.
+- **Cross-sell discovery:** bounded product association rules with support, confidence and lift.
+- **Repurchase prediction:** train on April history, evaluate 60-day outcomes in July and October; compare logistic regression against recency ranking.
+- **Campaign economics:** interactive break-even and incremental-contribution scenarios with explicit assumptions.
+- See [methodology](docs/methodology.md) for time boundaries, sampling, leakage controls and limitations.
+
+The October backtest achieved ROC AUC 0.717 and top-20% purchase-propensity lift 1.65 versus 1.32 for the recency baseline. These are historical ranking results, not campaign uplift.
+
 ## Business questions
 
 1. How do purchase sales, order volume and average order value vary by month?
@@ -29,7 +39,8 @@ The pipeline downloads the original UCI ZIP (approximately 23 MB), caches it loc
 ## Deliverables
 
 - `src/pipeline.py`: download, exact-duplicate removal, purchase filtering, audit and reconciliation.
-- `sql/metrics.sql`: order grain, monthly KPIs, 90-day repeat, cohort retention and behavioral segments.
+- `sql/metrics.sql` and `sql/advanced.sql`: order grain, monthly KPIs, 90-day repeat, cohort retention, behavioral segments and signed-sales reconciliation.
+- `src/advanced.py`: basket mining, time-separated repurchase modeling, calibration and baseline evaluation.
 - `app.py`: interactive Streamlit dashboard with Plotly charts and data quality disclosure.
 - `outputs/`: reproducible aggregates and source checksum; customer-level exports are pseudonymous original public IDs, not personal contact details.
 - `docs/findings.md`: calculated findings, interpretation and proposed actions.
