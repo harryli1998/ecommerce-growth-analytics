@@ -24,3 +24,12 @@ No visitor-conversion, CAC, ROAS, campaign uplift or profit result is supported 
 ## Interview discussion
 
 Explain order versus line grain, why purchase sales differ from net revenue, why first observed purchase differs from acquisition, how right censoring changes the repeat denominator, and how to distinguish association from incremental campaign effect. These methods were implemented with AI assistance and should be reviewed before presenting as a portfolio.
+
+## Temporal repurchase backtest
+
+- 2011-07-01 / Logistic regression: ROC AUC 0.736, average precision 0.671, top-20% precision 73.6%, lift 1.94.
+- 2011-07-01 / Recency ranking baseline: ROC AUC 0.674, average precision 0.527, top-20% precision 56.6%, lift 1.49.
+- 2011-10-01 / Logistic regression: ROC AUC 0.717, average precision 0.717, top-20% precision 77.8%, lift 1.65.
+- 2011-10-01 / Recency ranking baseline: ROC AUC 0.671, average precision 0.598, top-20% precision 62.4%, lift 1.32.
+
+These results rank natural purchase propensity, not incremental marketing response. Training labels precede evaluation cutoffs; customers can recur across dates. See methodology.md for limitations.
