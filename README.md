@@ -56,4 +56,4 @@ Source: [UCI Online Retail](https://archive.ics.uci.edu/dataset/352/online+retai
 
 ## GitHub publication
 
-Prepared locally. Review the outputs and publish under your own GitHub account when access is available. Do not add tokens to files. Use real commit timestamps and describe this as an independent portfolio project. No client, work-hour, earlier employment or prior project history is asserted.
+Published as an independent portfolio project at https://github.com/harryli1998/ecommerce-growth-analytics with real commit timestamps. No client, work-hour, earlier employment or prior project history is asserted. The Streamlit dashboard runs locally using the instructions above; GitHub hosts the source and preview image.
