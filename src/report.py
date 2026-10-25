@@ -42,6 +42,12 @@ No visitor-conversion, CAC, ROAS, campaign uplift or profit result is supported 
 
 Explain order versus line grain, why purchase sales differ from net revenue, why first observed purchase differs from acquisition, how right censoring changes the repeat denominator, and how to distinguish association from incremental campaign effect. These methods were implemented with AI assistance and should be reviewed before presenting as a portfolio.
 '''
+    if (out/'model_evaluation.csv').exists():
+        model=pd.read_csv(out/'model_evaluation.csv')
+        text += '\n## Temporal repurchase backtest\n\n'
+        for _, row in model.iterrows():
+            text += f"- {row['cutoff']} / {row['model']}: ROC AUC {row['roc_auc']:.3f}, average precision {row['average_precision']:.3f}, top-20% precision {row['precision_top20']:.1%}, lift {row['lift_top20']:.2f}.\n"
+        text += '\nThese results rank natural purchase propensity, not incremental marketing response. Training labels precede evaluation cutoffs; customers can recur across dates. See methodology.md for limitations.\n'
     (ROOT/'docs/findings.md').write_text(text)
 
 if __name__=='__main__':

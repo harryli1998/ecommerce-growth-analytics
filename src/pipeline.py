@@ -52,6 +52,8 @@ def run():
     assert abs(metrics['gross_sales'] - (purchases.Quantity*purchases.UnitPrice).sum()) < .01
     assert con.sql('SELECT count(*) FROM orders').fetchall()[0][0] == purchases.InvoiceNo.nunique()
     assert con.sql('SELECT count(*) FROM cohorts WHERE retention < 0 OR retention > 1').fetchall()[0][0] == 0
+    from advanced import run_advanced
+    run_advanced(df, purchases, con)
     con.close()
     from report import write_report
     write_report()
