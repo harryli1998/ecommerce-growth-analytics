@@ -43,6 +43,8 @@ with action:
     st.markdown('**Proposed experiments, not demonstrated uplift**\n\n- Lapsed repeat: randomized win-back offer with a no-message holdout.\n- One-time observed: test a second-purchase reminder, with eligibility based on consent and recency.\n- Active repeat: test relevant product recommendations against business-as-usual.\n\nMeasure incremental repeat rate and contribution profit over 90 days. Predefine sample size, exclusions and guardrails before launch.')
 with quality:
     st.json(s)
+    if (ROOT/'outputs/quality_report.json').exists():
+        st.dataframe(pd.read_json(ROOT/'outputs/quality_report.json'), hide_index=True)
     st.warning('No sessions, funnel events, ad spend, channel attribution or margin data. Visitor conversion, CAC, ROAS and profit cannot be calculated from this dataset.')
     st.markdown('[Source and CC BY 4.0 attribution](https://archive.ics.uci.edu/dataset/352/online+retail) · Daqing Chen (2015), DOI: 10.24432/C5BW33. Cleaning and aggregation are modifications.')
 
@@ -76,6 +78,15 @@ else:
         st.plotly_chart(px.scatter(cal,x='predicted',y='observed',size='customers',color='cutoff',hover_data=['probability_band'],range_x=[0,1],range_y=[0,1]),use_container_width=True)
         st.caption('Train: April 1 snapshot. Evaluate: July 1 and October 1 snapshots; each uses an exclusive 60-day future window. Features use only earlier purchases; scaler fits on training data. Coefficients are descriptive conditional associations. These same customers may occur across dates: this tests recurring-customer scoring, not unseen-customer performance. No hyperparameter tuning or marketing experiment. Top-20% lift measures purchase propensity, not incremental persuasion.')
         st.dataframe(pd.read_csv(ROOT/'outputs/model_coefficients.csv'),hide_index=True)
+        if (ROOT/'outputs/policy_comparison.csv').exists():
+            st.subheader('Does the choice still work at a different contact budget?')
+            policy = pd.read_csv(ROOT/'outputs/policy_comparison.csv')
+            st.dataframe(policy, hide_index=True)
+            st.plotly_chart(px.line(policy, x='budget_fraction', y='precision_difference',
+                                   color='cutoff', markers=True,
+                                   labels={'budget_fraction':'Fraction selected', 'precision_difference':'Model − recency purchase rate'}), use_container_width=True)
+            st.caption('95% paired customer-bootstrap intervals are in the table (1,000 draws, fixed seed). Conditional on this fitted model and each historical snapshot; they exclude training uncertainty and are not causal uplift or future performance guarantees. Budget choices were examined after observing outcomes; this is sensitivity analysis, not a new untouched test.')
+
     with planner:
         st.subheader('What incremental response would make a campaign worthwhile?')
         contacts=st.number_input('Eligible contacts',min_value=0,value=1000,step=100)

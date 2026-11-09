@@ -33,3 +33,10 @@ Explain order versus line grain, why purchase sales differ from net revenue, why
 - 2011-10-01 / Recency ranking baseline: ROC AUC 0.671, average precision 0.598, top-20% precision 62.4%, lift 1.32.
 
 These results rank natural purchase propensity, not incremental marketing response. Training labels precede evaluation cutoffs; customers can recur across dates. See methodology.md for limitations.
+
+## Capacity-sensitive policy comparison
+
+- 2011-07-01: select 592 customers; model minus recency purchase rate 17.1% (95% paired bootstrap interval 13.7% to 21.0%).
+- 2011-10-01: select 724 customers; model minus recency purchase rate 15.3% (95% paired bootstrap interval 12.0% to 18.6%).
+
+Conditional historical ranking comparison; not incremental marketing uplift. See [decision memo](decision-memo.md) for assumptions, other budgets and proposed experimental validation.

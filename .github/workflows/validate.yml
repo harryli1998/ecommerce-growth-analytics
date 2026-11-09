@@ -1,0 +1,28 @@
+name: Validate analytics
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: Download and rebuild original public dataset
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+      - run: python src/verify.py
+      - if: github.event_name == 'workflow_dispatch' && inputs.rebuild
+        run: python src/pipeline.py
+      - if: github.event_name == 'workflow_dispatch' && inputs.rebuild
+        run: python src/verify.py

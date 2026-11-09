@@ -1,18 +1,39 @@
-# E-commerce Growth & Marketing Analytics
+# Commerce Decision Analytics
 
-An independent portfolio project started October 24, 2026. Built with AI assistance; the owner should review and understand the methods before presenting it. This is a new public-data analysis, not client work, employment history or evidence of work performed in earlier months.
+A reproducible retail analytics workflow for a concrete decision: **when outreach capacity is limited, does a purchase-propensity model outperform a simple recency rule enough to justify an experiment?**
+
+Built on 541,909 historical transaction lines, with SQL metric definitions, fail-closed input contracts, temporal model evaluation and an interactive decision dashboard. This is an independent, AI-assisted public-data portfolio study, not a deployed client system.
 
 ![Dashboard preview](docs/dashboard.png)
 
-## Version 2: decision analytics
+## What a reviewer can assess
 
-- **Signed-sales bridge:** reconcile purchase sales, negative-quantity lines and exceptions at month level.
-- **Cross-sell discovery:** bounded product association rules with support, confidence and lift.
-- **Repurchase prediction:** train on April history, evaluate 60-day outcomes in July and October; compare logistic regression against recency ranking.
-- **Campaign economics:** interactive break-even and incremental-contribution scenarios with explicit assumptions.
-- See [methodology](docs/methodology.md) for time boundaries, sampling, leakage controls and limitations.
+| Decision / risk | Implemented evidence |
+| --- | --- |
+| Can sales totals be trusted? | Line → order → monthly reconciliation, invoice-grain and calendar-day checks and signed-sales bridge |
+| Are repeat rates distorted by short follow-up? | Mature 90-day denominators and observed-only cohort cells |
+| Is ML better than a simple rule? | April training, July/October evaluation, recency and random-selection comparisons |
+| Does the answer change with contact capacity? | 5/10/20/40% policy curves and paired customer-bootstrap intervals |
+| Can another analyst audit this run? | Pinned environment, source checksum, quality report and artifact/code hash manifest |
+| Does this prove marketing impact? | No. A documented holdout experiment is the next decision gate |
 
-The October backtest achieved ROC AUC 0.717 and top-20% purchase-propensity lift 1.65 versus 1.32 for the recency baseline. These are historical ranking results, not campaign uplift.
+**Historical result:** at the October 20% capacity, the model's purchase precision was 77.8% versus 62.4% for recency. This ranks natural buying propensity; it does not estimate persuasion or incremental revenue. Read the [generated findings](docs/findings.md), [decision memo](docs/decision-memo.md) and [methodology](docs/methodology.md) before interpreting the comparison.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[UCI ZIP + pinned SHA-256] --> C[Schema and value contracts]
+    C --> D[Deduplicated purchase lines]
+    D --> S[DuckDB SQL metric marts]
+    S --> Q[Quality gates and reconciliation]
+    Q --> M[Temporal scoring and policy comparison]
+    M --> A[CSV artifacts + run manifest]
+    A --> R[Generated decision readout]
+    A --> V[Streamlit dashboard]
+```
+
+The source ZIP and DuckDB cache stay local. Committed CSVs allow a reviewer to inspect the analysis without downloading raw data; they are derived public data, not client extracts.
 
 ## Business questions
 
@@ -30,16 +51,26 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python src/pipeline.py
-pytest -q
+python -m pytest -q
+python src/verify.py
 streamlit run app.py
 ```
 
-The pipeline downloads the original UCI ZIP (approximately 23 MB), caches it locally, computes a SHA-256 checksum, runs SQL in DuckDB and exports CSV/JSON outputs. Raw data and local environment are excluded from Git. To refresh, delete `data/raw/online-retail.zip` and rerun. A different upstream checksum requires review; the validated checksum is in `outputs/summary.json`. No credentials are required.
+The pipeline downloads the original UCI ZIP (approximately 23 MB), caches it locally, computes a SHA-256 checksum, runs SQL in DuckDB and exports CSV/JSON outputs. Raw data and local environment are excluded from Git. To refresh, delete `data/raw/online-retail.zip` and rerun. A different upstream checksum stops the pipeline before parsing; the expected checksum is pinned in `src/contracts.py`. Review provenance before changing it. No credentials are required.
+
+## Validation and operation
+
+GitHub Actions runs the test suite and manifest verification on pushes and pull requests. A manual workflow option additionally downloads and rebuilds the original dataset. The tests cover temporal boundaries, cohort censoring, reconciliation, paired-policy equivalence, malformed input rejection and dashboard interactions. The full rebuild applies quality gates to the actual dataset.
+
+`python src/verify.py` checks that source analysis code and derived CSV/JSON files match the successful run manifest. The timestamp identifies the computation time; bootstrap draws use a fixed seed. SQL row ordering and floating-point reductions can differ across runs; the manifest verifies one exact run, while reconciliations use explicit numeric tolerances. The run timestamp changes. Inspect `outputs/quality_report.json` for named checks. Input/check failures stop execution; a failed run may leave partial files, so rebuild successfully and verify before using outputs. A current successful manifest is required for release.
 
 ## Deliverables
 
 - `src/pipeline.py`: download, exact-duplicate removal, purchase filtering, audit and reconciliation.
 - `sql/metrics.sql` and `sql/advanced.sql`: order grain, monthly KPIs, 90-day repeat, cohort retention, behavioral segments and signed-sales reconciliation.
+- `src/contracts.py`: source identity/schema contracts and named aggregate quality gates.
+- `src/decision.py`: capacity-sensitive paired policy comparison with fixed-seed bootstrap uncertainty.
+- `src/verify.py`: verify run provenance and detect stale or modified artifacts.
 - `src/advanced.py`: basket mining, time-separated repurchase modeling, calibration and baseline evaluation.
 - `app.py`: interactive Streamlit dashboard with Plotly charts and data quality disclosure.
 - `outputs/`: reproducible aggregates and source checksum; customer-level exports are pseudonymous original public IDs, not personal contact details.

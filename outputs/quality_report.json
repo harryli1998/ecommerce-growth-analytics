@@ -1,0 +1,37 @@
+[
+  {
+    "check": "line_to_order_sales",
+    "status": "PASS",
+    "detail": "Absolute difference GBP 0.00000000; tolerance 0.01"
+  },
+  {
+    "check": "unique_invoice_grain",
+    "status": "PASS",
+    "detail": "One customer grouping per purchase invoice"
+  },
+  {
+    "check": "invoice_calendar_day_consistency",
+    "status": "PASS",
+    "detail": "Purchase invoice timestamps must fall on one calendar day"
+  },
+  {
+    "check": "within_invoice_timestamp_variation",
+    "status": "WARN",
+    "detail": "42 invoices have multiple timestamps; order time uses earliest line timestamp. Same-day variation is accepted, not silently discarded."
+  },
+  {
+    "check": "cohort_bounds",
+    "status": "PASS",
+    "detail": "Observed retention in [0,1]"
+  },
+  {
+    "check": "monthly_sales_reconcile",
+    "status": "PASS",
+    "detail": "Monthly sales reconcile to purchase lines"
+  },
+  {
+    "check": "mature_repeat_population",
+    "status": "PASS",
+    "detail": "3370 customers with full follow-up"
+  }
+]

@@ -1,5 +1,7 @@
 import importlib.util
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"src"))
 import duckdb
 import pandas as pd
 from streamlit.testing.v1 import AppTest
@@ -18,6 +20,7 @@ def test_clean_and_cohort_censoring():
         ['C4','A',-1,10,'2011-05-15',1,'UK'],
         ['5','A',1,0,'2011-05-15',2,'UK'],
     ],columns=['InvoiceNo','StockCode','Quantity','UnitPrice','InvoiceDate','CustomerID','Country'])
+    raw['Description'] = 'Fixture product'
     clean,purchases = pipeline.clean(raw)
     assert len(clean)==5 and len(purchases)==3
     con=duckdb.connect()

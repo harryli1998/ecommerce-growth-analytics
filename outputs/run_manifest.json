@@ -1,0 +1,38 @@
+{
+  "run_at_utc": "2026-11-09T11:08:29.397228+00:00",
+  "source_sha256": "f5385cbb54bbebf7196389109c6b0621faab0c304e3702548165e71c84aede8b",
+  "python": "3.14.7",
+  "packages": {
+    "duckdb": "2.0.0",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "scikit-learn": "1.9.1"
+  },
+  "artifact_sha256": {
+    "advanced_metadata.json": "ba9712e1f08828512fd71a67bef186286c6471088a8085089edc1afab1e937ba",
+    "backtest_predictions.csv": "3494a10e9c2ad438d946e8f09c2272330207a0d84f80b1d878db8769c06c5739",
+    "basket_rules.csv": "f828eadc61e84f4693d16617686e49d8d4eb9d8cb69ae71ba477f76ce253110c",
+    "calibration.csv": "7c97669d650785ee1951737cc6e99c256baffb59fd0bfb212b5191ff8ca38416",
+    "cohorts.csv": "d9801e5fd6468e1ccaca953ecfc87ebca6834daa2d948585026ce973d2130c58",
+    "customers.csv": "d005aac9f980af1fcfc36a884b7f2179f58d494d743e7565efc80e6b4710ab95",
+    "model_coefficients.csv": "9fbbb3f054bd2881e4a7a8597fbdeb2163d14d8816e35fa4563831f5e213787e",
+    "model_evaluation.csv": "19a3a25885583a45c285735f853cbebb0b16b351ffb327979b4eb38aafe84571",
+    "monthly.csv": "9a84d3cf985fe34fff3eb4d4bc79a86b714502a7f093adbcb658b5a3f431fca9",
+    "policy_comparison.csv": "cb3e5819a8492aeb0773dc1883512b5c396b0612b4f0e0007792a6bb68a7b2c6",
+    "quality_report.json": "0260d2e10090d1614aa86de6ae4980717de4a2fe9a0b8cce7b4d689ad18acf2b",
+    "repeat_90.csv": "fcfe19e9a419c8c975f60b4caa365812a91fda306771f649918b2c53dcc24055",
+    "revenue_bridge.csv": "dcdc68aed0603f0d6fdb1ee8774ab55424956d65168ced369da2c02686d5bfc7",
+    "segments.csv": "392de84ef901b58f4f025b3133be5a6c8c039843b263d224d20d328496e9a835",
+    "summary.json": "d26f662e4a2354a8a06906e61740e3d93ed24dfca25083c199b034d01cbc76e7"
+  },
+  "code_sha256": {
+    "src/advanced.py": "19de1c2705f5130b50181aa497bca614ec6bd849e3fe869869d12f55f50eda3b",
+    "src/contracts.py": "15154a0b009fe282cdd1e35cf83c26810b477f21e612af6e45d9e671293f2e92",
+    "src/decision.py": "4d33a2f16f11a220c2cd87466a0cdb95a7697838c50b065e8ea5f3ec1b6f5ccb",
+    "src/pipeline.py": "f355ae1689fe1e88efeadc884a101ea3c9c9d8c5fab3f6f01d0da704ad2ca7f5",
+    "src/report.py": "5ba940cbf374f227a4a0a147685ac3048ce6802021c502776f3ef947de91e4bf",
+    "src/verify.py": "cf15c90703dcca3777cfe47efeb6c38db3bc5877a4d58249b39ce8244be90c3d",
+    "sql/advanced.sql": "e28a615ec543658de19101da112f0c26fe2e892ce35d523e8da3de5962f978ac",
+    "sql/metrics.sql": "267213162c5e513246557fecfb312ce400775094b88fd0d4d99f589573c7986e"
+  }
+}

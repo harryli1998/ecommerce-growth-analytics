@@ -76,7 +76,10 @@ def run_advanced(df, purchases, con):
     metrics=[]
     predictions=[]
     calibration=[]
+    policies=[]
     for cutoff in ['2011-07-01','2011-10-01']:
+        if pd.Timestamp(cutoff) + pd.Timedelta(days=60) > df.InvoiceDate.max().normalize():
+            raise ValueError('Evaluation horizon is not fully observed')
         test = snapshot(orders,cutoff)
         p = model.predict_proba(np.log1p(test[FEATURES]))[:,1]
         metrics.append(evaluation(test.returned,p,'Logistic regression',cutoff))
@@ -86,11 +89,16 @@ def run_advanced(df, purchases, con):
         # scoring over time, not generalization to entirely unseen identities.
         test['probability']=p
         test['cutoff']=cutoff
+        from decision import policy_comparison
+        policy = policy_comparison(test)
+        policy['cutoff'] = cutoff
+        policies.append(policy)
         predictions.append(test[['customer_id','cutoff',*FEATURES,'returned','probability']])
         test['probability_band']=pd.cut(p,bins=[0,.2,.4,.6,.8,1],include_lowest=True).astype(str)
         cal=test.groupby('probability_band').agg(customers=('returned','size'),predicted=('probability','mean'),observed=('returned','mean')).reset_index()
         cal['cutoff']=cutoff
         calibration.append(cal)
+    pd.concat(policies).to_csv(out/'policy_comparison.csv', index=False)
     pd.DataFrame(metrics).to_csv(out/'model_evaluation.csv',index=False)
     pd.concat(predictions).to_csv(out/'backtest_predictions.csv',index=False)
     pd.concat(calibration).to_csv(out/'calibration.csv',index=False)

@@ -4,6 +4,10 @@ import hashlib
 import io
 import json
 import zipfile
+import platform
+from datetime import datetime, timezone
+from importlib.metadata import version
+from contracts import validate_input, validate_source_hash, quality_checks
 import duckdb
 import pandas as pd
 import requests
@@ -12,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 URL = 'https://archive.ics.uci.edu/static/public/352/online+retail.zip'
 
 def clean(raw):
+    validate_input(raw)
     df = raw.drop_duplicates().copy()
     df['InvoiceNo'] = df.InvoiceNo.astype(str)
     df['CustomerID'] = df.CustomerID.astype('Int64').astype('string')
@@ -29,6 +34,8 @@ def run():
         response = requests.get(URL, timeout=180)
         response.raise_for_status()
         archive.write_bytes(response.content)
+    source_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
+    validate_source_hash(source_hash)
     with zipfile.ZipFile(archive) as z:
         name = next(n for n in z.namelist() if n.endswith('.xlsx'))
         raw = pd.read_excel(io.BytesIO(z.read(name)), engine='openpyxl')
@@ -48,6 +55,10 @@ def run():
              'data_start':str(df.InvoiceDate.min()),'data_end':str(df.InvoiceDate.max()),
              **metrics,**repeat}
     (out/'summary.json').write_text(json.dumps(audit,indent=2))
+    checks = quality_checks(con, purchases)
+    (out/'quality_report.json').write_text(json.dumps(checks, indent=2))
+    if any(row['status'] == 'FAIL' for row in checks):
+        raise ValueError('Data quality gate failed; inspect outputs/quality_report.json')
     # Reconciliation prevents lost orders or duplicated sales in aggregation.
     assert abs(metrics['gross_sales'] - (purchases.Quantity*purchases.UnitPrice).sum()) < .01
     assert con.sql('SELECT count(*) FROM orders').fetchall()[0][0] == purchases.InvoiceNo.nunique()
@@ -57,6 +68,15 @@ def run():
     con.close()
     from report import write_report
     write_report()
+    artifacts = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                 for p in sorted(out.iterdir()) if p.suffix in {'.csv', '.json'} and p.name != 'run_manifest.json'}
+    manifest = {'run_at_utc': datetime.now(timezone.utc).isoformat(),
+                'source_sha256': source_hash, 'python': platform.python_version(),
+                'packages': {p: version(p) for p in ['duckdb','pandas','numpy','scikit-learn']},
+                'artifact_sha256': artifacts,
+                'code_sha256': {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                for folder in ['src','sql'] for p in sorted((ROOT/folder).glob('*')) if p.is_file()}}
+    (out/'run_manifest.json').write_text(json.dumps(manifest, indent=2))
     print(json.dumps(audit,indent=2))
 
 if __name__ == '__main__':

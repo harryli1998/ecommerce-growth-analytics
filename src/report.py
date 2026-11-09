@@ -48,6 +48,14 @@ Explain order versus line grain, why purchase sales differ from net revenue, why
         for _, row in model.iterrows():
             text += f"- {row['cutoff']} / {row['model']}: ROC AUC {row['roc_auc']:.3f}, average precision {row['average_precision']:.3f}, top-20% precision {row['precision_top20']:.1%}, lift {row['lift_top20']:.2f}.\n"
         text += '\nThese results rank natural purchase propensity, not incremental marketing response. Training labels precede evaluation cutoffs; customers can recur across dates. See methodology.md for limitations.\n'
+    if (out/'policy_comparison.csv').exists():
+        policy = pd.read_csv(out/'policy_comparison.csv')
+        text += '\n## Capacity-sensitive policy comparison\n\n'
+        for _, row in policy[policy.budget_fraction == .2].iterrows():
+            text += (f"- {row['cutoff']}: select {row['selected_customers']:.0f} customers; "
+                     f"model minus recency purchase rate {row['precision_difference']:.1%} "
+                     f"(95% paired bootstrap interval {row['difference_ci_low']:.1%} to {row['difference_ci_high']:.1%}).\n")
+        text += '\nConditional historical ranking comparison; not incremental marketing uplift. See [decision memo](decision-memo.md) for assumptions, other budgets and proposed experimental validation.\n'
     (ROOT/'docs/findings.md').write_text(text)
 
 if __name__=='__main__':
